@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caesar Cipher</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e2f;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      background: #2a2a3d;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+      width: 450px;
+      text-align: center;
+    }
+    input, textarea, button {
+      margin: 8px 0;
+      padding: 8px;
+      width: 90%;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
+    button {
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .btn-small {
+      width: 45%;
+      margin: 5px;
+    }
+    textarea {
+      height: 70px;
+    }
+    pre {
+      background: #1a1a28;
+      padding: 10px;
+      border-radius: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      text-align: left;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔐 Caesar Cipher Tool</h2>
+    <textarea id="message" placeholder="Enter your message"></textarea>
+    <input type="number" id="shift" placeholder="Enter shift value (e.g., 3)">
+    <button onclick="encrypt()">Encrypt</button>
+    <button onclick="decrypt()">Decrypt</button>
+    <button onclick="bruteForce()">Brute Force Decrypt</button>
+    <h3>Result:</h3>
+    <pre id="result"></pre>
+    <button class="btn-small" onclick="copyText()">📋 Copy</button>
+    <button class="btn-small" onclick="saveFile()">💾 Save</button>
+    <button class="btn-small" onclick="randomShift()">🎲 Random Shift</button>
+    <button class="btn-small" onclick="clearAll()">🧹 Clear</button>
+  </div>
+
+  <script>
+    function caesarCipher(text, shift) {
+      let result = "";
+      for (let i = 0; i < text.length; i++) {
+        let char = text[i];
+        if (char.match(/[a-z]/i)) {
+          let code = text.charCodeAt(i);
+          if (code >= 65 && code <= 90) {
+            char = String.fromCharCode(((code - 65 + shift) % 26 + 26) % 26 + 65);
+          } else if (code >= 97 && code <= 122) {
+            char = String.fromCharCode(((code - 97 + shift) % 26 + 26) % 26 + 97);
+          }
+        }
+        result += char;
+      }
+      return result;
+    }
+
+    function encrypt() {
+      let message = document.getElementById("message").value;
+      let shift = parseInt(document.getElementById("shift").value);
+      if (isNaN(shift)) {
+        alert("Please enter a shift value!");
+        return;
+      }
+      document.getElementById("result").innerText = caesarCipher(message, shift);
+    }
+
+    function decrypt() {
+      let message = document.getElementById("message").value;
+      let shift = parseInt(document.getElementById("shift").value);
+      if (isNaN(shift)) {
+        alert("Please enter a shift value!");
+        return;
+      }
+      document.getElementById("result").innerText = caesarCipher(message, -shift);
+    }
+
+    function bruteForce() {
+      let message = document.getElementById("message").value;
+      if (message.trim() === "") {
+        alert("Enter a message first!");
+        return;
+      }
+      let output = "";
+      for (let s = 1; s < 26; s++) {
+        output += `Shift ${s}: ${caesarCipher(message, -s)}\n`;
+      }
+      document.getElementById("result").innerText = output;
+    }
+
+    function copyText() {
+      let text = document.getElementById("result").innerText;
+      if (text.trim() === "") {
+        alert("Nothing to copy!");
+        return;
+      }
+      navigator.clipboard.writeText(text);
+      alert("Copied to clipboard!");
+    }
+
+    function saveFile() {
+      let text = document.getElementById("result").innerText;
+      if (text.trim() === "") {
+        alert("Nothing to save!");
+        return;
+      }
+      let blob = new Blob([text], { type: "text/plain" });
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "caesar_cipher.txt";
+      link.click();
+    }
+
+    function randomShift() {
+      let rand = Math.floor(Math.random() * 25) + 1;
+      document.getElementById("shift").value = rand;
+      alert("Random Shift Value: " + rand);
+    }
+
+    function clearAll() {
+      document.getElementById("message").value = "";
+      document.getElementById("shift").value = "";
+      document.getElementById("result").innerText = "";
+    }
+  </script>
+</body>
+</html>
